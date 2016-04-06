@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
                             for (int x = 0; x < a.length; x += 4) {
                                 Point start = new Point(a[x], a[x + 1]);
                                 Point end = new Point(a[x + 2], a[x + 3]);
-                                line(rgbMat, start, end, new Scalar(0, 255, 0), 3);
+                                line(rgbMat, start, end, new Scalar(0, 0, 255), 3);
                                 Utils.matToBitmap(rgbMat, lineBitmap);
                                 // System.out.format("x1=%d,y1=%d,x2=%d,y2=%d\n",x1,y1,x2,y2);
                                 y++;
