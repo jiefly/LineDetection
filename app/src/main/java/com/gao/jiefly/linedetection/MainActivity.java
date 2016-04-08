@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -43,7 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Bitmap srcBitmap, grayBitmap, lineBitmap;
     private ImageView iv, iv1, iv2;
     private Button btnChooseImage, btnOpenCam;
-    private Uri imageUri;
+    //private Uri imageUri;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -161,7 +159,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (requestCode) {
             case PICTURE_TAKE:
                 if (resultCode == RESULT_OK)
-                    detechLine(data);
+                    //detechLine(data);
                 break;
 
             case PICTURE_CHOOSE:
@@ -211,11 +209,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 handler.sendEmptyMessage(2);
                 //存储识别出的直线
                 lines = new Mat();
-                int threshold = 90;
+                int threshold = 200;
                 //最小边缘长度
                 int minLineSize = 50;
                 //线中的最大间隔
-                int lineGap = 20;
+                int lineGap = 10;
                 //识别图片耗时
                 double startTime = System.currentTimeMillis();
                 Imgproc.HoughLinesP(contours, lines, 1, Math.PI / 180, threshold, minLineSize, lineGap);
@@ -223,19 +221,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 int[] a = new int[(int) lines.total() * lines.channels()];
                 //数组a存储检测出的直线端点坐标
-                lines.get(0, 0, a);
-                int y = 0;
-                for (int x = 0; x < a.length; x += 4) {
-                    Point start = new Point(a[x], a[x + 1]);
-                    Point end = new Point(a[x + 2], a[x + 3]);
-                    line(rgbMat, start, end, new Scalar(0, 0, 255), 3);
-                    Utils.matToBitmap(rgbMat, lineBitmap);
-                    // System.out.format("x1=%d,y1=%d,x2=%d,y2=%d\n",x1,y1,x2,y2);
-                    y++;
+                if (a.length>4){
+                    lines.get(0, 0, a);
+                    int y = 0;
+                    for (int x = 0; x < a.length; x += 4) {
+                        Point start = new Point(a[x], a[x + 1]);
+                        Point end = new Point(a[x + 2], a[x + 3]);
+                        line(rgbMat, start, end, new Scalar(0, 0, 255), 3);
+                        Utils.matToBitmap(rgbMat, lineBitmap);
+                        // System.out.format("x1=%d,y1=%d,x2=%d,y2=%d\n",x1,y1,x2,y2);
+                        y++;
+                    }
+                    handler.sendEmptyMessage(3);
+                    // System.out.println("width:" + lines.width() + "height:" + lines.height());
+                    System.out.println("总共有" + y + "条线");
                 }
-                handler.sendEmptyMessage(3);
-                // System.out.println("width:" + lines.width() + "height:" + lines.height());
-                System.out.println("总共有" + y + "条线");
             }
         })).start();
     }
@@ -253,19 +253,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         switch (v.getId()) {
             case R.id.btnChooseImage:
-                imageUri = Uri.fromFile(outputImage);
+              //  imageUri = Uri.fromFile(outputImage);
                 Intent intent1 = new Intent("android.intent.action.GET_CONTENT");
                 intent1.setType("image/*");
                 intent1.putExtra("crop", true);
                 intent1.putExtra("scale", true);
-                intent1.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent1, PICTURE_TAKE);
+               // intent1.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent1, PICTURE_CHOOSE);
                 break;
             case R.id.btnOpenCam:
-                imageUri = Uri.fromFile(outputImage);
+               // imageUri = Uri.fromFile(outputImage);
                 Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, PICTURE_CHOOSE);
+               // intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent, PICTURE_TAKE);
                 break;
         }
     }
