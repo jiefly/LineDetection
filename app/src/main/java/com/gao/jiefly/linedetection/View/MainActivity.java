@@ -1,4 +1,4 @@
-package com.gao.jiefly.linedetection;
+package com.gao.jiefly.linedetection.View;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.gao.jiefly.linedetection.R;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.OpenCVLoader;
@@ -277,6 +279,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 //数组a存储检测出的直线端点坐标
                 if (a.length > 4) {
                     lines.get(0, 0, a);
+                    for (int i:a)
+                        System.out.print(i+",");
                     int y = 0;
                     for (int x = 0; x < a.length; x += 4) {
                         Point start = new Point(a[x], a[x + 1]);
@@ -287,6 +291,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         y++;
                     }
                     handler.sendEmptyMessage(3);
+                    
                     // System.out.println("width:" + lines.width() + "height:" + lines.height());
                     System.out.println("总共有" + y + "条线");
                 }
