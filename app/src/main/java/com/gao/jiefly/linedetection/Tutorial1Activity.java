@@ -155,6 +155,7 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
                 Point start = new Point(a[x], a[x + 1]);
                 Point end = new Point(a[x + 2], a[x + 3]);
                 line(mRgba, start, end, new Scalar(0, 0, 255), 2);
+               //Log.i("jiefly",a[x]+","+ a[x + 1]+","+a[x + 2]+","+a[x + 3]+",");
             }
         }
        // Imgproc.Canny(mGray, mTmp, canny_1, canny_2);
