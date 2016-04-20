@@ -17,12 +17,25 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import static org.opencv.imgproc.Imgproc.line;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.opencv.imgproc.Imgproc.CHAIN_APPROX_SIMPLE;
+import static org.opencv.imgproc.Imgproc.MORPH_RECT;
+import static org.opencv.imgproc.Imgproc.RETR_CCOMP;
+import static org.opencv.imgproc.Imgproc.THRESH_BINARY;
+import static org.opencv.imgproc.Imgproc.circle;
+import static org.opencv.imgproc.Imgproc.dilate;
+import static org.opencv.imgproc.Imgproc.erode;
+import static org.opencv.imgproc.Imgproc.getStructuringElement;
+import static org.opencv.imgproc.Imgproc.threshold;
 
 public class Tutorial1Activity extends Activity implements CvCameraViewListener2 {
     private static final String TAG = "OCVSample::Activity";
@@ -139,14 +152,13 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
 
-
-        if (detechOk || firstDetech) {
+        return findRect(mGray,mRgba);
+        /*if (detechOk || firstDetech) {
             Imgproc.GaussianBlur(inputFrame.rgba(), mRgba, new Size(5, 5), 0, 0);
             new mThread().start();
             detechOk = false;
             firstDetech = false;
         }
-
         //数组a存储检测出的直线端点坐标
         int[] a = new int[(int) mLines.total() * mLines.channels()];
         if (a.length > 4) {
@@ -158,8 +170,8 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
                //Log.i("jiefly",a[x]+","+ a[x + 1]+","+a[x + 2]+","+a[x + 3]+",");
             }
         }
-       // Imgproc.Canny(mGray, mTmp, canny_1, canny_2);
-        return mRgba;
+       // Imgproc.Canny(mGray, mTmp, canny_1, canny_2);*/
+       // return mRgba;
     }
 
     public class mThread extends Thread {
@@ -176,4 +188,48 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
     }
 
     private int canny_1=100,canny_2=120;
+
+
+    private Mat findRect(Mat grayMat,Mat srcMat){
+        Mat tmp = new Mat();
+        //int g_nStructElementSize = 3; //结构元素(内核矩阵)的尺寸
+
+        //获取自定义核
+        Mat element = getStructuringElement(MORPH_RECT,
+                new Size(3,3));
+        //Imgproc.Canny(grayMat,tmp,110,110);
+        threshold(grayMat,tmp,125,255,THRESH_BINARY);
+        Mat dilate = new Mat();
+        dilate(tmp,dilate,element);
+        Mat erode = new Mat();
+        erode(dilate,erode,element);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+
+        Imgproc.findContours(erode,contours,new Mat(),RETR_CCOMP,CHAIN_APPROX_SIMPLE);
+        int i = 0;
+        for (MatOfPoint matOfPoint:contours){
+            i++;
+            if (Imgproc.contourArea(matOfPoint)>500){
+                Rect rect = Imgproc.boundingRect(matOfPoint);
+                int x,y,w,h;
+                x = rect.x;
+                y = rect.y;
+                w = rect.width;
+                h = rect.height;
+                Imgproc.rectangle(srcMat,new Point(x,y),new Point(x+w,y+h),new Scalar(0,255,0),2);
+                circle(srcMat,new Point(x+w/2,y+h/2),3,new Scalar(255,0,0),2);
+
+                /*Moments moments =
+                        Imgproc.moments(matOfPoint);
+
+                double cx = moments.get_m10()/moments.get_m00();
+                double cy = moments.get_m01()/moments.get_m00();
+                circle(srcMat,new Point(cx,cy),3,new Scalar(255,0,0),2);*/
+            }
+        }
+        return srcMat;
+
+
+    }
 }
