@@ -15,7 +15,6 @@
         <activity
             android:name=".View.MainActivity"
             android:theme="@style/test">
-
         </activity>
         <activity
             android:name=".Tutorial1Activity"
@@ -26,6 +25,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".Main2Activity">
         </activity>
     </application>
 
