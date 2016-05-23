@@ -1,12 +1,17 @@
 package com.gao.jiefly.linedetection.Util;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,6 +28,28 @@ public class Util {
     public static Double[] thetas = new Double[]{};
     public static List<String> keyList;
     public static List<Double> valueList;
+
+
+    /** 保存方法 */
+    public static void saveBitmap(String picName,Bitmap bitmap) {
+        Log.e("jiefly", "保存图片");
+        File f = new File("/sdcard/", picName+".jpg");
+        if (f.exists()) {
+            f.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+            Log.i("jiefly", "已经保存");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public static LinkedList<List<Integer>> getRet(int[] point) {
         HashMap<String, Double> theta = new HashMap<>();
