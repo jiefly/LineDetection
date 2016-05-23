@@ -12,6 +12,34 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_but"/>
+        android:id="@+id/btn_bind" android:text="绑定"/>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="下"
+        android:id="@+id/btnDown" android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"/>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="右"
+        android:id="@+id/btnRight" android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="上"
+        android:id="@+id/btnUp" android:layout_above="@+id/btnDown"
+        android:layout_alignParentStart="true"/>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="左"
+        android:id="@+id/btnLeft" android:layout_above="@+id/btnRight"
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

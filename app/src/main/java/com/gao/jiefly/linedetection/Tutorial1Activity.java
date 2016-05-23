@@ -1,16 +1,20 @@
 package com.gao.jiefly.linedetection;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.gao.jiefly.linedetection.Util.Util;
 
@@ -52,10 +56,7 @@ import static org.opencv.imgproc.Imgproc.threshold;
 public class Tutorial1Activity extends Activity implements CvCameraViewListener2 {
     private static final String TAG = "OCVSample::Activity";
     boolean detechOk = false;
-    boolean firstDetech = true;
     private CameraBridgeViewBase mOpenCvCameraView;
-    private boolean mIsJavaCamera = true;
-    private MenuItem mItemSwitchCamera = null;
     private Mat mRgba;
     private Mat mGray;
     private Mat mHsvMat;
@@ -65,16 +66,43 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
     private Mat mDetechMat;
     private long currentTime;
     private Bitmap bitmap;
-    private static final int BITMAP_OK = 1;
+    private static final int BITMAP_OK = 6;
+    private static final int SEND_TOAST = 5;
+    private static final int UP = 0;
+    private static final int DOWN = 1;
+    private static final int LEFT = 2;
+    private static final int RIGHT = 3;
+    private static final int STOP = 4;
+
 
     private boolean isDetech = false;
 
     private ImageView mImageView;
+    private CarControlService.ControlBinder mControlBinder;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.i("jiefly", "service connected");
+            mControlBinder = (CarControlService.ControlBinder) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
     private android.os.Handler mHandler = new android.os.Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == BITMAP_OK)
-                mImageView.setImageBitmap(bitmap);
+            switch (msg.what) {
+                case BITMAP_OK:
+                    mImageView.setImageBitmap(bitmap);
+                    break;
+                case SEND_TOAST:
+                    Toast.makeText(Tutorial1Activity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
+            }
         }
     };
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -98,9 +126,6 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
@@ -124,7 +149,23 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
                 Log.e("jiefly", "isDetech:" + isDetech);
             }
         });
-        // mOpenCvCameraView.
+        Button btnBind = (Button) findViewById(R.id.btn_bind);
+        btnBind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //绑定service，通过service来操控小车
+                bindService(new Intent(Tutorial1Activity.this, CarControlService.class), mServiceConnection, BIND_AUTO_CREATE);
+            }
+        });
+
+
+        Button btnTest = (Button) findViewById(R.id.btnTest);
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mControlBinder.move(UP,1000);
+            }
+        });
     }
 
     @Override
@@ -148,6 +189,8 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
 
     public void onDestroy() {
         super.onDestroy();
+        //解绑service，防止内存泄漏
+        unbindService(mServiceConnection);
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
