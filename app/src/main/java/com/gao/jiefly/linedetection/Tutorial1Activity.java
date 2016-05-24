@@ -163,7 +163,7 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mControlBinder.move(UP, 1000);
+                mControlBinder.move(UP,1000);
             }
         });
     }
@@ -230,14 +230,12 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(mTmp, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
         Log.e("jiefly", "contours size:" + contours.size());
-        //MatOfPoint maxContour = contours.get(0);
         for (int i = 0; i < contours.size(); i++) {
-            //Log.e("jiefly","宽："+contours.get(i).width()+"高"+contours.get(i).height());
             //Log.e("jiefly","宽："+contours.get(i).width()+"高"+contours.get(i).height());
             Imgproc.drawContours(mRgba, contours, i, new Scalar(255, 0, 0));
             if (contours.get(i).width() * contours.get(i).height() > 100) {
 
-                Imgproc.drawContours(mRgba, contours, i, new Scalar(0, 0, 255),2);
+                //Imgproc.drawContours(mRgba, contours, i, new Scalar(0, 0, 255),2);
                 //Log.e("jiefly", "宽：" + contours.get(i).width() + "高" + contours.get(i).height());
                 Rect rect = Imgproc.boundingRect(contours.get(i));
                 int x, y, w, h;
@@ -257,10 +255,14 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
                     mHandler.sendEmptyMessage(BITMAP_OK);
                     isDetech = false;
                 }
+
+                if (findRect(mDetechMat)) {
+                    Imgproc.rectangle(mRgba, new Point(x, y), new Point(x + w, y + h), new Scalar(0, 255, 0), 2);
+                }
             }
         }
         return mRgba;
-    }
+
        /* // return findRect(mGray,mRgba);
         if (detechOk || firstDetech) {
             Imgproc.GaussianBlur(inputFrame.rgba(), mRgba, new Size(5, 5), 0, 0);
@@ -279,9 +281,9 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
                //Log.i("jiefly",a[x]+","+ a[x + 1]+","+a[x + 2]+","+a[x + 3]+",");
             }
         }*/
-    // Imgproc.Canny(mGray, mTmp, canny_1, canny_2);
-    // return mRgba;
-
+        // Imgproc.Canny(mGray, mTmp, canny_1, canny_2);
+        // return mRgba;
+    }
 
     public class mThread extends Thread {
         @Override
@@ -358,7 +360,5 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
             }
         }
         return srcMat;
-
-
     }
 }
