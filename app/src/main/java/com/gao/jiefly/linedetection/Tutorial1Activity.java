@@ -224,6 +224,8 @@ public class Tutorial1Activity extends Activity implements CvCameraViewListener2
         //return findRect(mGray,mRgba);
         Imgproc.cvtColor(mRgba, mHsvMat, Imgproc.COLOR_RGB2HSV);
         Scalar lowerThreshold = new Scalar(160, 100, 100);//红色-低 hsv
+/*        75 90 90
+                140 255 255*/
         Scalar upperThreshold = new Scalar(179, 255, 255);//红色-高 hsv
         Core.inRange(mHsvMat, lowerThreshold, upperThreshold, mMaskMat);
         Imgproc.dilate(mMaskMat, mTmp, new Mat());
